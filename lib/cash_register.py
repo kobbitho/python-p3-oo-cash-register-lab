@@ -1,28 +1,34 @@
 #!/usr/bin/env python3
 class CashRegister:
-    def __init__(self):
-        self.items = []
-        self.total = 0
-        self.last_transaction = 0
+  def __init__(self, discount=0):
+    self.discount = discount
+    self.total = 0
+    self.items = []
 
-    def add_item(self, item, quantity, price):
-        self.items.append((item, quantity, price))
-        self.total += quantity * price
+  def add_item(self, title, price, quantity=1):
+    if not isinstance(price, float) or price <= 0:
+      raise ValueError("Price must be a positive number")
+    if not isinstance(quantity, int) or quantity <= 0:
+      raise ValueError("Quantity must be a positive integer")
+    self.total += price * quantity
+    self.items.append((title, price, quantity))
 
-    def apply_discount(self, discount_percentage):
-        discount_amount = self.total * (discount_percentage / 100)
-        return self.total - discount_amount
+  def apply_discount(self):
+    if not isinstance(self.discount, (int, float)) or not (0 <= self.discount <= 1):
+      raise ValueError("Discount must be a number between 0 and 1 (inclusive)")
+    self.total -= self.total * self.discount
+    
+  
+  def void_last_transaction(self):
+    if not self.items:
+      raise IndexError("No transactions to void")
+    last_item = self.items.pop()
+    self.total -= last_item[1] * last_item[2]
+    
+  def get_last_transaction_amount(self):
+    if not self.items:
+      return None
+    return self.items[-1][1] * self.items[-1][2]
+   
 
-    def void_last_transaction(self):
-        if self.last_transaction > 0:
-            self.total -= self.last_transaction
-            self.last_transaction = 0
 
-    def get_items(self):
-        return self.items
-
-    def get_total(self):
-        return self.total
-
-    def get_last_transaction(self):
-        return self.last_transaction
